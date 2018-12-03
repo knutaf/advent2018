@@ -1,0 +1,3 @@
+[submodule "aoclib"]
+	path = aoclib
+	url = ../aoclib_rs.git
