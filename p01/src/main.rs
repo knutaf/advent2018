@@ -1,16 +1,47 @@
 #![feature(nll)]
 
+use std::collections::HashSet;
+
 extern crate aoclib;
 use aoclib::*;
 
-/*
-impl Iterator for Thing {
-    type Item = u32;
+struct Tracker<'v> {
+    total : i32,
+    iter : std::iter::Cycle<std::slice::Iter<'v, i32>>,
+    seen : HashSet<i32>,
+    done : bool,
+}
 
-    fn next(&mut self) -> Option<Self::Item> {
+impl<'v> Tracker<'v> {
+    fn new(nums : &'v Vec<i32>) -> Tracker<'v> {
+        Tracker {
+            total : 0,
+            iter : nums.iter().cycle(),
+            seen : HashSet::new(),
+            done : false,
+        }
     }
 }
-*/
+
+impl<'v> Iterator for Tracker<'v> {
+    type Item = i32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.done {
+            None
+        } else {
+            self.iter.next().map(|num| {
+                if !self.seen.insert(self.total) {
+                    self.done = true;
+                }
+
+                let ret = self.total;
+                self.total += num;
+                ret
+            })
+        }
+    }
+}
 
 fn solve_a(input : &str) -> i32 {
     input.lines().fold(0, |sofar, line| {
@@ -18,8 +49,15 @@ fn solve_a(input : &str) -> i32 {
     })
 }
 
-fn solve_b(input : &str) -> u32 {
-    0
+fn solve_b(input : &str) -> i32 {
+    let nums = input.lines().map(|line| {
+        line.parse::<i32>().unwrap()
+    }).collect::<Vec<i32>>();
+
+    let mut tracker = Tracker::new(&nums);
+    tracker.
+    //inspect(|v| { println!("v: {}", v) }).
+    last().unwrap()
 }
 
 fn main() {
